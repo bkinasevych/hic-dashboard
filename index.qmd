@@ -1,11 +1,212 @@
 ---
-title: "hic-dashboard"
+format: html
+output-file: index
+execute:
+  warning: false
+  echo: false
 ---
 
-This is a Quarto website.
+```{r}
+library(tidyverse)
+library(janitor)
+library(scales)
+library(ggrepel)
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+dark_blue <- "#33376B"
+grey_blue <- "#ADB1CF"
+light_blue <- "#84D6D4"
+dark_grey <- "#545454"
+light_grey <- "#BFBFBF"
+cream <- "#EDE8DB"
+
+plot_theme <- function(){
+  theme_minimal() +
+    theme(panel.border = element_blank()
+    )
+}
+
+
+
+
+
+```
 
 ```{r}
-1 + 1
+
+projects <- read_csv("data/tbl_projects.csv") |>
+  clean_names() |> 
+  select(project_id, request_date, project_name, strategic_planning:decision) |> 
+  mutate(request_date = mdy(request_date)) |> 
+  mutate(quarter = case_when(
+    month(request_date) < 4 ~ 4,
+    month(request_date) > 3 & month(request_date) < 7 ~ 1,
+    month(request_date) > 6 & month(request_date) < 10 ~ 2,
+    TRUE ~ 3
+          )) |> 
+  mutate(fiscal_year = case_when(
+    quarter == 4 ~ year(request_date) - 1,
+    TRUE ~ year(request_date))) |> 
+  mutate(fiscal_year = factor(fiscal_year))
+
+
+
+projects <- projects |> 
+  pivot_longer(cols = c(strategic_planning:service_type_other),
+               names_to = "type") |> 
+  mutate(type = case_when(
+    type == "consultation" ~ "other",
+    type == "data_management" ~ "other",
+    type == "training" ~ "other",
+    type == "sroi" ~ "other",
+    type == "organizational_health" ~ "other",
+    type == "service_type_other" ~ "other",
+    TRUE ~ type
+  )) |> 
+  filter(value == TRUE) |> 
+  mutate(type = str_replace(type, "_", " ")) |> 
+  mutate(type = str_to_title(type)) |> 
+  mutate(type = factor(type, levels = c("Evaluation", "Strategic Planning", "Other"))) |> 
+  select(project_id:project_name, type, decision, quarter, fiscal_year)
+
+fees <- read_csv("data/tbl_fees.csv") |>
+  clean_names() |> 
+  select(fee_id, payment_date, payment_due, project_id) |> 
+  mutate(payment_date = mdy(payment_date)) |> 
+    mutate(quarter = case_when(
+    month(payment_date) < 4 ~ 4,
+    month(payment_date) > 3 & month(payment_date) < 7 ~ 1,
+    month(payment_date) > 6 & month(payment_date) < 10 ~ 2,
+    TRUE ~ 3
+          )) |> 
+  mutate(fiscal_year = case_when(
+    quarter == 4 ~ year(payment_date) - 1,
+    TRUE ~ year(payment_date)))
+
+
+
+
 ```
+
+### Number of service requests per fiscal year and quarter
+```{r}
+
+plot_data <- projects |> 
+  filter(fiscal_year %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |> 
+  group_by(fiscal_year, quarter) |> 
+  count(name = "n") |> 
+  ungroup()
+
+label_data <- plot_data |>
+  group_by(fiscal_year) |> 
+  slice_tail(n = 1) |> 
+  ungroup() |> 
+  rename(x = quarter, y = n)
+  
+
+ggplot(plot_data,
+       aes(x = quarter,
+       y = n,
+       colour = fiscal_year,
+       group = fiscal_year)) +
+  geom_line() +
+  geom_point() +
+  geom_text_repel(
+    data = label_data,
+    aes(x = x,
+        y = y,
+        label = fiscal_year,
+        colour = fiscal_year),
+    inherit.aes = FALSE,
+    show.legend = FALSE
+  ) +
+  scale_color_manual(
+    values = c(
+    "2020" = "grey",
+    "2021" = "grey",
+    "2022" = "grey",
+    "2023" = "grey",
+    "2024" = "grey",
+    "2025" = dark_blue)
+  ) +
+  labs(x = "Quarter",
+       y = "# of service requests") +
+  plot_theme() +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "none")
+  
+  
+  
+
+
+```
+
+### Number of service requests per fiscal year by type
+```{r}
+plot_data <- projects |> 
+  filter(fiscal_year != "2014",
+         fiscal_year != "2015") |> 
+  group_by(fiscal_year) |> 
+  count(type) |> 
+  ungroup()
+
+ggplot(data = plot_data,
+       aes(x = fiscal_year,
+             y = n,
+             fill = type)) +
+  geom_col(color = "white") +
+  scale_fill_manual(
+    values = c(dark_blue, light_blue, light_grey)) +
+  labs(y = "# of service requests",
+       x = "Fiscal Year",
+       fill = "") +
+  plot_theme() +
+  theme(
+    panel.grid.major = element_blank()
+  )
+```
+
+### Fees committeed per fiscal year
+```{r}
+fees |> 
+  group_by(fiscal_year) |> 
+  summarize(revenue = sum(payment_due)) |> 
+  filter(fiscal_year > 2020,
+         fiscal_year < 2026) |> 
+  ggplot(aes(x = fiscal_year,
+             y = revenue)) + 
+  geom_col(fill = dark_blue) +
+  geom_text(aes(label = dollar(revenue)),
+            vjust = -0.5) +
+  labs(x = "",
+       y = "") +
+  plot_theme() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_blank())
+```
+
+
+### Total fees committed in first two quarters of fiscal
+```{r}
+
+fees |> 
+  filter(quarter < 3) |> 
+  group_by(fiscal_year) |> 
+  summarise(revenue = sum(payment_due)) |> 
+  filter(fiscal_year %in% c("2023", "2024", "2025")) |> 
+  ggplot(aes(x = fiscal_year,
+             y = revenue)) +
+  geom_col(fill = dark_blue) +
+  geom_text(aes(label = dollar(revenue)),
+            vjust = -0.5) +
+  labs(y = "",
+       x = "") +
+  plot_theme() +
+  theme(axis.text.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+```
+
