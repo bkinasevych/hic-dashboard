@@ -166,7 +166,7 @@ ggplot(data = plot_data,
   )
 ```
 
-### Fees committeed per fiscal year
+### Fees committed per fiscal year
 ```{r}
 fees |> 
   group_by(fiscal_year) |> 
@@ -209,4 +209,5 @@ fees |>
 
 
 ```
+
 
