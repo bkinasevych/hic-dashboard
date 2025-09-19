@@ -20,7 +20,8 @@ light_grey <- "#BFBFBF"
 cream <- "#EDE8DB"
 
 plot_theme <- function(){
-  theme_minimal() +
+  theme_minimal(base_family = "Encode Sans",
+  base_size = 12) +
     theme(panel.border = element_blank()
     )
 }
@@ -32,11 +33,12 @@ plot_theme <- function(){
 ```
 
 ```{r}
-
+# load projects data
 projects <- read_csv("data/tbl_projects.csv") |>
   clean_names() |> 
-  select(project_id, request_date, project_name, strategic_planning:decision) |> 
+  select(project_id, request_date, project_name, service_type, decision, status) |> 
   mutate(request_date = mdy(request_date)) |> 
+  # add quarter and fiscal year columns
   mutate(quarter = case_when(
     month(request_date) < 4 ~ 4,
     month(request_date) > 3 & month(request_date) < 7 ~ 1,
@@ -46,28 +48,17 @@ projects <- read_csv("data/tbl_projects.csv") |>
   mutate(fiscal_year = case_when(
     quarter == 4 ~ year(request_date) - 1,
     TRUE ~ year(request_date))) |> 
-  mutate(fiscal_year = factor(fiscal_year))
-
-
-
-projects <- projects |> 
-  pivot_longer(cols = c(strategic_planning:service_type_other),
-               names_to = "type") |> 
-  mutate(type = case_when(
-    type == "consultation" ~ "other",
-    type == "data_management" ~ "other",
-    type == "training" ~ "other",
-    type == "sroi" ~ "other",
-    type == "organizational_health" ~ "other",
-    type == "service_type_other" ~ "other",
-    TRUE ~ type
+  mutate(fiscal_year = factor(fiscal_year)) |> 
+  # recode service type 
+  mutate(service_type = case_when(
+    service_type %in% c("Strategic planning", "Program evaluation") ~ service_type,
+    TRUE ~ "Other"
   )) |> 
-  filter(value == TRUE) |> 
-  mutate(type = str_replace(type, "_", " ")) |> 
-  mutate(type = str_to_title(type)) |> 
-  mutate(type = factor(type, levels = c("Evaluation", "Strategic Planning", "Other"))) |> 
-  select(project_id:project_name, type, decision, quarter, fiscal_year)
+    mutate(service_type = factor(service_type,
+    levels = c("Program evaluation", "Strategic planning", "Other")))
 
+
+# load fees data
 fees <- read_csv("data/tbl_fees.csv") |>
   clean_names() |> 
   select(fee_id, payment_date, payment_due, project_id) |> 
@@ -81,9 +72,6 @@ fees <- read_csv("data/tbl_fees.csv") |>
   mutate(fiscal_year = case_when(
     quarter == 4 ~ year(payment_date) - 1,
     TRUE ~ year(payment_date)))
-
-
-
 
 ```
 
@@ -147,13 +135,13 @@ plot_data <- projects |>
   filter(fiscal_year != "2014",
          fiscal_year != "2015") |> 
   group_by(fiscal_year) |> 
-  count(type) |> 
+  count(service_type) |> 
   ungroup()
 
 ggplot(data = plot_data,
        aes(x = fiscal_year,
              y = n,
-             fill = type)) +
+             fill = service_type)) +
   geom_col(color = "white") +
   scale_fill_manual(
     values = c(dark_blue, light_blue, light_grey)) +
@@ -210,4 +198,6 @@ fees |>
 
 ```
 
+```{r}
 
+```
