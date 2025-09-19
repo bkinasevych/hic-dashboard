@@ -69,8 +69,7 @@ fees <- read_csv("data/tbl_fees.csv") |>
     month(payment_date) > 6 & month(payment_date) < 10 ~ 2,
     TRUE ~ 3
           )) |> 
-  mutate(fiscal_year = case_when(
-    quarter == 4 ~ year(payment_date) - 1,
+  mutate(fiscal_year = case_when(quarter == 4 ~ year(payment_date) - 1,
     TRUE ~ year(payment_date)))
 
 ```
@@ -198,6 +197,4 @@ fees |>
 
 ```
 
-```{r}
 
-```
