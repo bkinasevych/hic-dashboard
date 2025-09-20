@@ -19,15 +19,10 @@ dark_grey <- "#545454"
 light_grey <- "#BFBFBF"
 cream <- "#EDE8DB"
 
-plot_theme <- function(){
-  theme_minimal(base_family = "Encode Sans",
-  base_size = 12) +
-    theme(panel.border = element_blank()
-    )
+plot_theme <- function() {
+  theme_minimal(base_family = "Encode Sans", base_size = 12) +
+    theme(panel.border = element_blank())
 }
-
-
-
 
 
 ```
@@ -35,118 +30,151 @@ plot_theme <- function(){
 ```{r}
 # load projects data
 projects <- read_csv("data/tbl_projects.csv") |>
-  clean_names() |> 
-  select(project_id, request_date, project_name, service_type, decision, status) |> 
-  mutate(request_date = mdy(request_date)) |> 
+  clean_names() |>
+  select(
+    project_id,
+    request_date,
+    project_name,
+    service_type,
+    decision,
+    status
+  ) |>
+  mutate(request_date = mdy(request_date)) |>
   # add quarter and fiscal year columns
-  mutate(quarter = case_when(
-    month(request_date) < 4 ~ 4,
-    month(request_date) > 3 & month(request_date) < 7 ~ 1,
-    month(request_date) > 6 & month(request_date) < 10 ~ 2,
-    TRUE ~ 3
-          )) |> 
-  mutate(fiscal_year = case_when(
-    quarter == 4 ~ year(request_date) - 1,
-    TRUE ~ year(request_date))) |> 
-  mutate(fiscal_year = factor(fiscal_year)) |> 
-  # recode service type 
-  mutate(service_type = case_when(
-    service_type %in% c("Strategic planning", "Program evaluation") ~ service_type,
-    TRUE ~ "Other"
-  )) |> 
-    mutate(service_type = factor(service_type,
-    levels = c("Program evaluation", "Strategic planning", "Other")))
+  mutate(
+    quarter = case_when(
+      month(request_date) < 4 ~ 4,
+      month(request_date) > 3 & month(request_date) < 7 ~ 1,
+      month(request_date) > 6 & month(request_date) < 10 ~ 2,
+      TRUE ~ 3
+    )
+  ) |>
+  mutate(
+    fiscal_year = case_when(
+      quarter == 4 ~ year(request_date) - 1,
+      TRUE ~ year(request_date)
+    )
+  ) |>
+  mutate(fiscal_year = factor(fiscal_year)) |>
+  # recode service type
+  mutate(
+    service_type = case_when(
+      service_type %in% c("Strategic planning", "Program evaluation") ~
+        service_type,
+      TRUE ~ "Other"
+    )
+  ) |>
+  mutate(
+    service_type = factor(
+      service_type,
+      levels = c("Program evaluation", "Strategic planning", "Other")
+    )
+  )
 
 
 # load fees data
 fees <- read_csv("data/tbl_fees.csv") |>
-  clean_names() |> 
-  select(fee_id, payment_date, payment_due, project_id) |> 
-  mutate(payment_date = mdy(payment_date)) |> 
-    mutate(quarter = case_when(
-    month(payment_date) < 4 ~ 4,
-    month(payment_date) > 3 & month(payment_date) < 7 ~ 1,
-    month(payment_date) > 6 & month(payment_date) < 10 ~ 2,
-    TRUE ~ 3
-          )) |> 
-  mutate(fiscal_year = case_when(quarter == 4 ~ year(payment_date) - 1,
-    TRUE ~ year(payment_date)))
+  clean_names() |>
+  select(fee_id, payment_date, payment_due, project_id) |>
+  mutate(payment_date = mdy(payment_date)) |>
+  mutate(
+    quarter = case_when(
+      month(payment_date) < 4 ~ 4,
+      month(payment_date) > 3 & month(payment_date) < 7 ~ 1,
+      month(payment_date) > 6 & month(payment_date) < 10 ~ 2,
+      TRUE ~ 3
+    )
+  ) |>
+  mutate(
+    fiscal_year = case_when(
+      quarter == 4 ~ year(payment_date) - 1,
+      TRUE ~ year(payment_date)
+    )
+  )
+
+
+# add service type to project fees
+service_type <- projects |>
+  select(project_id, service_type)
+
+fees <- fees |>
+  left_join(service_type) |>
+  mutate(
+    service_type = factor(
+      service_type,
+      levels = c(
+        "Program evaluation",
+        "Strategic planning",
+        "Other"
+      )
+    )
+  )
 
 ```
 
 ### Number of service requests per fiscal year and quarter
 ```{r}
 
-plot_data <- projects |> 
-  filter(fiscal_year %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |> 
-  group_by(fiscal_year, quarter) |> 
-  count(name = "n") |> 
+plot_data <- projects |>
+  filter(fiscal_year %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |>
+  group_by(fiscal_year, quarter) |>
+  count(name = "n") |>
   ungroup()
 
 label_data <- plot_data |>
-  group_by(fiscal_year) |> 
-  slice_tail(n = 1) |> 
-  ungroup() |> 
+  group_by(fiscal_year) |>
+  slice_tail(n = 1) |>
+  ungroup() |>
   rename(x = quarter, y = n)
-  
 
-ggplot(plot_data,
-       aes(x = quarter,
-       y = n,
-       colour = fiscal_year,
-       group = fiscal_year)) +
+
+ggplot(
+  plot_data,
+  aes(x = quarter, y = n, colour = fiscal_year, group = fiscal_year)
+) +
   geom_line() +
   geom_point() +
   geom_text_repel(
     data = label_data,
-    aes(x = x,
-        y = y,
-        label = fiscal_year,
-        colour = fiscal_year),
+    aes(x = x, y = y, label = fiscal_year, colour = fiscal_year),
     inherit.aes = FALSE,
     show.legend = FALSE
   ) +
   scale_color_manual(
     values = c(
-    "2020" = "grey",
-    "2021" = "grey",
-    "2022" = "grey",
-    "2023" = "grey",
-    "2024" = "grey",
-    "2025" = dark_blue)
+      "2020" = "grey",
+      "2021" = "grey",
+      "2022" = "grey",
+      "2023" = "grey",
+      "2024" = "grey",
+      "2025" = dark_blue
+    )
   ) +
-  labs(x = "Quarter",
-       y = "# of service requests") +
+  labs(x = "Quarter", y = "# of service requests") +
   plot_theme() +
-  theme(panel.grid.minor.x = element_blank(),
-        panel.grid.major.x = element_blank(),
-        legend.position = "none")
-  
-  
-  
+  theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    legend.position = "none"
+  )
 
 
 ```
 
 ### Number of service requests per fiscal year by type
 ```{r}
-plot_data <- projects |> 
-  filter(fiscal_year != "2014",
-         fiscal_year != "2015") |> 
-  group_by(fiscal_year) |> 
-  count(service_type) |> 
+plot_data <- projects |>
+  filter(fiscal_year != "2014", fiscal_year != "2015") |>
+  group_by(fiscal_year) |>
+  count(service_type) |>
   ungroup()
 
-ggplot(data = plot_data,
-       aes(x = fiscal_year,
-             y = n,
-             fill = service_type)) +
+ggplot(data = plot_data, aes(x = fiscal_year, y = n, fill = service_type)) +
   geom_col(color = "white") +
   scale_fill_manual(
-    values = c(dark_blue, light_blue, light_grey)) +
-  labs(y = "# of service requests",
-       x = "Fiscal Year",
-       fill = "") +
+    values = c(dark_blue, light_blue, light_grey)
+  ) +
+  labs(y = "# of service requests", x = "Fiscal Year", fill = "") +
   plot_theme() +
   theme(
     panel.grid.major = element_blank()
@@ -155,45 +183,61 @@ ggplot(data = plot_data,
 
 ### Fees committed per fiscal year
 ```{r}
-fees |> 
-  group_by(fiscal_year) |> 
-  summarize(revenue = sum(payment_due)) |> 
-  filter(fiscal_year > 2020,
-         fiscal_year < 2026) |> 
-  ggplot(aes(x = fiscal_year,
-             y = revenue)) + 
+fees_by_fiscal <- fees |>
+  group_by(fiscal_year) |>
+  summarize(revenue = sum(payment_due)) |>
+  filter(fiscal_year > 2020 & fiscal_year < 2026)
+
+fees_by_fiscal |>
+  ggplot(aes(x = fiscal_year, y = revenue)) +
   geom_col(fill = dark_blue) +
-  geom_text(aes(label = dollar(revenue)),
-            vjust = -0.5) +
-  labs(x = "",
-       y = "") +
+  geom_text(aes(label = dollar(revenue)), vjust = -0.5) +
+  labs(x = "", y = "") +
   plot_theme() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.y = element_blank())
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_blank()
+  )
+```
+
+```{r}
+# total fees committed per fiscal year by project type
+fees |>
+  filter(fiscal_year > 2020 & fiscal_year < 2026) |>
+  select(fiscal_year, payment_due, service_type) |>
+  group_by(fiscal_year, service_type) |>
+  summarize(revenue = sum(payment_due, na.rm = TRUE)) |>
+  ggplot() +
+  geom_col(aes(x = fiscal_year, y = revenue, fill = service_type)) +
+  geom_text(
+    data = fees_by_fiscal,
+    aes(x = fiscal_year, y = revenue, label = dollar(revenue), vjust = -0.5)
+  ) +
+  plot_theme()
+
+
 ```
 
 
 ### Total fees committed in first two quarters of fiscal
 ```{r}
 
-fees |> 
-  filter(quarter < 3) |> 
-  group_by(fiscal_year) |> 
-  summarise(revenue = sum(payment_due)) |> 
-  filter(fiscal_year %in% c("2023", "2024", "2025")) |> 
-  ggplot(aes(x = fiscal_year,
-             y = revenue)) +
+fees |>
+  filter(quarter < 3) |>
+  group_by(fiscal_year) |>
+  summarise(revenue = sum(payment_due)) |>
+  filter(fiscal_year %in% c("2023", "2024", "2025")) |>
+  ggplot(aes(x = fiscal_year, y = revenue)) +
   geom_col(fill = dark_blue) +
-  geom_text(aes(label = dollar(revenue)),
-            vjust = -0.5) +
-  labs(y = "",
-       x = "") +
+  geom_text(aes(label = dollar(revenue)), vjust = -0.5) +
+  labs(y = "", x = "") +
   plot_theme() +
-  theme(axis.text.y = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
+  theme(
+    axis.text.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 
 ```
 
