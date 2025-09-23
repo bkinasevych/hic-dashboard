@@ -201,6 +201,8 @@ fees_by_fiscal |>
   )
 ```
 
+## Fees committed per fiscal year by project type
+
 ```{r}
 # total fees committed per fiscal year by project type
 fees |>
@@ -210,11 +212,20 @@ fees |>
   summarize(revenue = sum(payment_due, na.rm = TRUE)) |>
   ggplot() +
   geom_col(aes(x = fiscal_year, y = revenue, fill = service_type)) +
+    scale_fill_manual(
+    values = c(dark_blue, light_blue, light_grey)
+  ) +
   geom_text(
     data = fees_by_fiscal,
     aes(x = fiscal_year, y = revenue, label = dollar(revenue), vjust = -0.5)
   ) +
-  plot_theme()
+    labs(x = "",
+    y = "",
+    fill = "") +
+  plot_theme() +
+  theme(panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.text.y = element_blank())
 
 
 ```
