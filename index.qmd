@@ -201,7 +201,7 @@ fees_by_fiscal |>
   )
 ```
 
-## Fees committed per fiscal year by project type
+## Fees committed per fiscal by type of project
 
 ```{r}
 # total fees committed per fiscal year by project type
