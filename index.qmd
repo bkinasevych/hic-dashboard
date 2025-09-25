@@ -161,26 +161,6 @@ ggplot(
 
 ```
 
-### Number of service requests per fiscal year by type
-```{r}
-plot_data <- projects |>
-  filter(fiscal_year != "2014", fiscal_year != "2015") |>
-  group_by(fiscal_year) |>
-  count(service_type) |>
-  ungroup()
-
-ggplot(data = plot_data, aes(x = fiscal_year, y = n, fill = service_type)) +
-  geom_col(color = "white") +
-  scale_fill_manual(
-    values = c(dark_blue, light_blue, light_grey)
-  ) +
-  labs(y = "# of service requests", x = "Fiscal Year", fill = "") +
-  plot_theme() +
-  theme(
-    panel.grid.major = element_blank()
-  )
-```
-
 ### Fees committed per fiscal year
 ```{r}
 fees_by_fiscal <- fees |>
@@ -201,7 +181,29 @@ fees_by_fiscal |>
   )
 ```
 
-## Fees committed per fiscal by type of project
+### Number of service requests per fiscal year by type
+```{r}
+plot_data <- projects |>
+  filter(fiscal_year != "2014", fiscal_year != "2015") |>
+  group_by(fiscal_year) |>
+  count(service_type) |>
+  ungroup()
+
+ggplot(data = plot_data, aes(x = fiscal_year, y = n, fill = service_type)) +
+  geom_col(color = "white") +
+  scale_fill_manual(
+    values = c(dark_blue, light_blue, light_grey)
+  ) +
+  labs(y = "# of service requests", x = "Fiscal Year", fill = "") +
+  plot_theme() +
+  theme(
+    panel.grid.major = element_blank()
+  )
+```
+
+
+
+### Fees committed per fiscal by type of project
 
 ```{r}
 # total fees committed per fiscal year by project type
@@ -252,4 +254,33 @@ fees |>
 
 ```
 
+### Fee distribution
 
+```{r}
+project_name <- projects |> 
+  select(project_id, project_name)
+
+fee_distribution <- fees |> 
+  left_join(project_name) |> 
+  filter(fiscal_year > 2020 & fiscal_year < 2026) |> 
+  mutate(fiscal_year = factor(fiscal_year)) |> 
+  select(fiscal_year, payment_due, project_name) |> 
+  mutate(label = case_when(
+    payment_due > 25000 ~ project_name,
+    TRUE ~ NA
+  ))
+
+fee_distribution |>   
+  ggplot(aes(x = payment_due,
+             y = fiscal_year)) +
+  geom_boxplot(aes(group = fiscal_year)) +
+  geom_text_repel(aes(label = label),
+            size = 3) +
+  scale_x_continuous(labels = dollar_format()) +
+  labs(y = "",
+       x = "Fees") +
+    plot_theme() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())
+  
+```
