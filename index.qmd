@@ -6,11 +6,14 @@ execute:
   echo: false
 ---
 
+
 ```{r}
+# load packages
 library(tidyverse)
 library(janitor)
 library(scales)
 library(ggrepel)
+library(Microsoft365R)
 
 dark_blue <- "#33376B"
 grey_blue <- "#ADB1CF"
@@ -29,9 +32,38 @@ plot_theme <- function() {
 ```
 
 ```{r}
+# get data from Sharepoint
+
+site <- get_sharepoint_site(site_name = "Health in Common Team Site")
+
+projects_list <- site$get_list("tbl_projects")
+fees_list <- site$get_list("tbl_fees")
+
+projects <- as_tibble(
+  projects_list$list_items(
+  filter = NULL,
+  select = NULL
+))
+
+projects <- projects |> 
+  rename("project_id" = id)
+
+fees <- as_tibble(
+  fees_list$list_items(
+  filter = NULL,
+  select = NULL
+))
+
+fees <- fees |> 
+  rename("fee_id" = id,
+         "project_id" = project_idLookupId)
+```
+
+
+```{r}
 # load projects data
-projects <- read_csv("data/tbl_projects.csv") |>
-  clean_names() |>
+projects <- projects |> 
+  clean_names() |> 
   select(
     project_id,
     request_date,
@@ -40,7 +72,9 @@ projects <- read_csv("data/tbl_projects.csv") |>
     decision,
     status
   ) |>
-  mutate(request_date = mdy(request_date)) |>
+  mutate(request_date = as_date(
+    ymd_hms(request_date)
+    )) |>
   # add quarter and fiscal year columns
   mutate(
     quarter = case_when(
@@ -74,10 +108,12 @@ projects <- read_csv("data/tbl_projects.csv") |>
 
 
 # load fees data
-fees <- read_csv("data/tbl_fees.csv") |>
+fees <- fees |>
   clean_names() |>
   select(fee_id, payment_date, payment_due, project_id) |>
-  mutate(payment_date = mdy(payment_date)) |>
+  mutate(payment_date = as_date(
+    ymd_hms(payment_date)
+    )) |>
   mutate(
     quarter = case_when(
       month(payment_date) < 4 ~ 4,
