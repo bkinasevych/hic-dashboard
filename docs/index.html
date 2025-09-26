@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.5.22">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -98,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -117,7 +117,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#number-of-service-requests-per-fiscal-year-by-type" id="toc-number-of-service-requests-per-fiscal-year-by-type" class="nav-link" data-scroll-target="#number-of-service-requests-per-fiscal-year-by-type">Number of service requests per fiscal year by type</a></li>
   <li><a href="#fees-committed-per-fiscal-by-type-of-project" id="toc-fees-committed-per-fiscal-by-type-of-project" class="nav-link" data-scroll-target="#fees-committed-per-fiscal-by-type-of-project">Fees committed per fiscal by type of project</a></li>
   <li><a href="#total-fees-committed-in-first-two-quarters-of-fiscal" id="toc-total-fees-committed-in-first-two-quarters-of-fiscal" class="nav-link" data-scroll-target="#total-fees-committed-in-first-two-quarters-of-fiscal">Total fees committed in first two quarters of fiscal</a></li>
-  <li><a href="#fee-distribution" id="toc-fee-distribution" class="nav-link" data-scroll-target="#fee-distribution">Fee distribution</a></li>
+  <li><a href="#fees-paid-by-project-per-fiscal" id="toc-fees-paid-by-project-per-fiscal" class="nav-link" data-scroll-target="#fees-paid-by-project-per-fiscal">Fees paid by project per fiscal</a></li>
   </ul>
 </nav>
     </div>
@@ -187,8 +187,9 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="fee-distribution" class="level3">
-<h3 class="anchored" data-anchor-id="fee-distribution">Fee distribution</h3>
+<section id="fees-paid-by-project-per-fiscal" class="level3">
+<h3 class="anchored" data-anchor-id="fees-paid-by-project-per-fiscal">Fees paid by project per fiscal</h3>
+<p>The labeled points are fees over $30,000</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -282,6 +283,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -316,7 +335,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');

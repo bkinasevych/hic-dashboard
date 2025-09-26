@@ -20,11 +20,12 @@ light_grey <- "#BFBFBF"
 cream <- "#EDE8DB"
 
 plot_theme <- function() {
-  theme_minimal(base_family = "Encode Sans", base_size = 12) +
-    theme(panel.border = element_blank())
+  theme_minimal(base_family = "Encode Sans", base_size = 11, ink = dark_blue) +
+    theme(
+      panel.border = element_blank(),
+      plot.background = element_rect(fill = cream)
+    )
 }
-
-
 ```
 
 ```{r}
@@ -109,12 +110,10 @@ fees <- fees |>
       )
     )
   )
-
 ```
 
 ### Number of service requests per fiscal year and quarter
 ```{r}
-
 plot_data <- projects |>
   filter(fiscal_year %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |>
   group_by(fiscal_year, quarter) |>
@@ -157,8 +156,6 @@ ggplot(
     panel.grid.major.x = element_blank(),
     legend.position = "none"
   )
-
-
 ```
 
 ### Fees committed per fiscal year
@@ -190,7 +187,7 @@ plot_data <- projects |>
   ungroup()
 
 ggplot(data = plot_data, aes(x = fiscal_year, y = n, fill = service_type)) +
-  geom_col(color = "white") +
+  geom_col() +
   scale_fill_manual(
     values = c(dark_blue, light_blue, light_grey)
   ) +
@@ -214,28 +211,29 @@ fees |>
   summarize(revenue = sum(payment_due, na.rm = TRUE)) |>
   ggplot() +
   geom_col(aes(x = fiscal_year, y = revenue, fill = service_type)) +
-    scale_fill_manual(
+  scale_fill_manual(
     values = c(dark_blue, light_blue, light_grey)
   ) +
   geom_text(
     data = fees_by_fiscal,
     aes(x = fiscal_year, y = revenue, label = dollar(revenue), vjust = -0.5)
   ) +
-    labs(x = "",
+  labs(
+    x = "",
     y = "",
-    fill = "") +
+    fill = ""
+  ) +
   plot_theme() +
-  theme(panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  axis.text.y = element_blank())
-
-
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_blank()
+  )
 ```
 
 
 ### Total fees committed in first two quarters of fiscal
 ```{r}
-
 fees |>
   filter(quarter < 3) |>
   group_by(fiscal_year) |>
@@ -251,36 +249,50 @@ fees |>
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
   )
-
 ```
 
-### Fee distribution
+### Fees paid by project per fiscal
+The labeled points are fees over $30,000
 
 ```{r}
-project_name <- projects |> 
+project_name <- projects |>
   select(project_id, project_name)
 
-fee_distribution <- fees |> 
-  left_join(project_name) |> 
-  filter(fiscal_year > 2020 & fiscal_year < 2026) |> 
-  mutate(fiscal_year = factor(fiscal_year)) |> 
-  select(fiscal_year, payment_due, project_name) |> 
+fee_distribution <- fees |>
+  left_join(project_name) |>
+  filter(fiscal_year > 2020 & fiscal_year < 2026) |>
+  select(fiscal_year, payment_due, project_name) |>
   mutate(label = case_when(
-    payment_due > 25000 ~ project_name,
+    payment_due > 30000 ~ project_name,
     TRUE ~ NA
-  ))
+  )) |> 
+  mutate(label = str_wrap(label, width = 20))
 
-fee_distribution |>   
-  ggplot(aes(x = payment_due,
-             y = fiscal_year)) +
-  geom_boxplot(aes(group = fiscal_year)) +
-  geom_text_repel(aes(label = label),
-            size = 3) +
-  scale_x_continuous(labels = dollar_format()) +
-  labs(y = "",
-       x = "Fees") +
-    plot_theme() +
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())
-  
+fee_distribution |> 
+  ggplot(aes(
+    x = fiscal_year,
+    y = payment_due
+  )) +
+  geom_point(
+    alpha = 0.3,
+    colour = dark_blue
+  ) +
+  geom_text_repel(aes
+            (label = label),
+            size = 3,
+            colour = dark_blue,
+            min.segment.length = 0.2
+  ) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(
+    x = "",
+    y = "",
+    title = ""
+  ) +
+  plot_theme() +
+  theme(
+    panel.grid.major = element_line(colour = light_grey,
+                                    linewidth = 0.25),
+    panel.grid.major.x = element_blank()
+  )
 ```
