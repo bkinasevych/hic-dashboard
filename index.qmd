@@ -339,7 +339,7 @@ fee_distribution |>
   )
 ```
 
-## Median of total MOU value by service type
+## Median of MOUs signed per fiscal by service type
 
 ```{r}
 service_type <- projects |> 
@@ -365,7 +365,7 @@ fees |>
   labs(x = "",
        y = "Median fees",
        fill = "",
-       caption = "Fiscal Year is based on the year in which the MOU was signed") +
+       caption = "Fiscal year is the year in which the MOU was signed") +
   plot_theme() +
   theme(
     panel.grid.major = element_blank(),

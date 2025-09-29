@@ -68,5 +68,12 @@
     "title": "hic-dashboard",
     "section": "Median of total MOU value by service type",
     "text": "Median of total MOU value by service type"
+  },
+  {
+    "objectID": "index.html#median-of-mous-signed-per-fiscal-by-service-type",
+    "href": "index.html#median-of-mous-signed-per-fiscal-by-service-type",
+    "title": "hic-dashboard",
+    "section": "Median of MOUs signed per fiscal by service type",
+    "text": "Median of MOUs signed per fiscal by service type"
   }
 ]
