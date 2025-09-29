@@ -1,6 +1,12 @@
 ---
-format: html
+format:
+  html:
+    toc: true
+  pptx:
+    slide-level: 2
 output-file: index
+format-pptx:
+  output-file: slides
 execute:
   warning: false
   echo: false
@@ -148,7 +154,7 @@ fees <- fees |>
   )
 ```
 
-### Number of service requests per fiscal year and quarter
+## Number of service requests per fiscal year and quarter
 ```{r}
 plot_data <- projects |>
   filter(fiscal_year %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |>
@@ -194,7 +200,7 @@ ggplot(
   )
 ```
 
-### Fees committed per fiscal year
+## Fees committed per fiscal year
 ```{r}
 fees_by_fiscal <- fees |>
   group_by(fiscal_year) |>
@@ -214,7 +220,7 @@ fees_by_fiscal |>
   )
 ```
 
-### Number of service requests per fiscal year by type
+## Number of service requests per fiscal year by type
 ```{r}
 plot_data <- projects |>
   filter(fiscal_year != "2014", fiscal_year != "2015") |>
@@ -236,7 +242,7 @@ ggplot(data = plot_data, aes(x = fiscal_year, y = n, fill = service_type)) +
 
 
 
-### Fees committed per fiscal by type of project
+## Fees committed per fiscal by type of project
 
 ```{r}
 # total fees committed per fiscal year by project type
@@ -268,7 +274,7 @@ fees |>
 ```
 
 
-### Total fees committed in first two quarters of fiscal
+## Total fees committed in first two quarters of fiscal
 ```{r}
 fees |>
   filter(quarter < 3) |>
@@ -287,8 +293,7 @@ fees |>
   )
 ```
 
-### Fees paid by project per fiscal
-The labeled points are fees over $30,000
+## Fees paid by project per fiscal
 
 ```{r}
 project_name <- projects |>
@@ -323,7 +328,8 @@ fee_distribution |>
   labs(
     x = "",
     y = "",
-    title = ""
+    title = "",
+    caption = "The labeled points are fees over $30,000"
   ) +
   plot_theme() +
   theme(
@@ -332,3 +338,36 @@ fee_distribution |>
     panel.grid.major.x = element_blank()
   )
 ```
+
+## Average fees per fiscal by service type
+
+```{r}
+service_type <- projects |> 
+  select(project_name, service_type, project_id)
+
+fees |> 
+  select(project_id, fiscal_year, payment_due) |> 
+  left_join(service_type) |> 
+  group_by(fiscal_year, service_type) |> 
+  filter(service_type != "Other") |> 
+  summarize(avg = mean(payment_due)) |> 
+  filter(fiscal_year > 2020, fiscal_year < 2026) |> 
+  ggplot(aes(x = fiscal_year,
+             y = avg,
+             fill = service_type)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(dark_blue, light_blue)) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(x = "",
+       y = "Average fees",
+       fill = "") +
+  plot_theme() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+  
+  
+
+```
+

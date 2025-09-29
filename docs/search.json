@@ -25,6 +25,41 @@
     "href": "index.html#fees-committed-per-fiscal-by-type-of-project",
     "title": "hic-dashboard",
     "section": "Fees committed per fiscal by type of project",
-    "text": "Fees committed per fiscal by type of project\n\n\n\n\n\n\n\n\n\n\nTotal fees committed in first two quarters of fiscal"
+    "text": "Fees committed per fiscal by type of project"
+  },
+  {
+    "objectID": "index.html#fees-committed-per-fiscal-year",
+    "href": "index.html#fees-committed-per-fiscal-year",
+    "title": "hic-dashboard",
+    "section": "Fees committed per fiscal year",
+    "text": "Fees committed per fiscal year"
+  },
+  {
+    "objectID": "index.html#number-of-service-requests-per-fiscal-year-by-type",
+    "href": "index.html#number-of-service-requests-per-fiscal-year-by-type",
+    "title": "hic-dashboard",
+    "section": "Number of service requests per fiscal year by type",
+    "text": "Number of service requests per fiscal year by type"
+  },
+  {
+    "objectID": "index.html#total-fees-committed-in-first-two-quarters-of-fiscal",
+    "href": "index.html#total-fees-committed-in-first-two-quarters-of-fiscal",
+    "title": "hic-dashboard",
+    "section": "Total fees committed in first two quarters of fiscal",
+    "text": "Total fees committed in first two quarters of fiscal"
+  },
+  {
+    "objectID": "index.html#fees-paid-by-project-per-fiscal",
+    "href": "index.html#fees-paid-by-project-per-fiscal",
+    "title": "hic-dashboard",
+    "section": "Fees paid by project per fiscal",
+    "text": "Fees paid by project per fiscal"
+  },
+  {
+    "objectID": "index.html#average-fees-per-fiscal-by-service-type",
+    "href": "index.html#average-fees-per-fiscal-by-service-type",
+    "title": "hic-dashboard",
+    "section": "Average fees per fiscal by service type",
+    "text": "Average fees per fiscal by service type"
   }
 ]
