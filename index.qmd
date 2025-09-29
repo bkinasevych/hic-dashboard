@@ -339,28 +339,33 @@ fee_distribution |>
   )
 ```
 
-## Average fees per fiscal by service type
+## Median of total MOU value by service type
 
 ```{r}
 service_type <- projects |> 
-  select(project_name, service_type, project_id)
+  select(service_type, project_id, fiscal_year)
 
 fees |> 
-  select(project_id, fiscal_year, payment_due) |> 
+  select(project_id, payment_due) |> 
+  group_by(project_id) |> 
+  summarize(
+  total_fees = sum(payment_due)  
+  ) |> 
   left_join(service_type) |> 
   group_by(fiscal_year, service_type) |> 
   filter(service_type != "Other") |> 
-  summarize(avg = mean(payment_due)) |> 
-  filter(fiscal_year > 2020, fiscal_year < 2026) |> 
+  summarize(median = median(total_fees, na.rm = TRUE)) |> 
+  filter(fiscal_year %in% c(2021, 2022, 2023, 2024, 2025)) |> 
   ggplot(aes(x = fiscal_year,
-             y = avg,
+             y = median,
              fill = service_type)) +
   geom_col(position = "dodge") +
   scale_fill_manual(values = c(dark_blue, light_blue)) +
   scale_y_continuous(labels = dollar_format()) +
   labs(x = "",
-       y = "Average fees",
-       fill = "") +
+       y = "Median fees",
+       fill = "",
+       caption = "Fiscal Year is based on the year in which the MOU was signed") +
   plot_theme() +
   theme(
     panel.grid.major = element_blank(),

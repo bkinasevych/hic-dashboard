@@ -61,5 +61,12 @@
     "title": "hic-dashboard",
     "section": "Average fees per fiscal by service type",
     "text": "Average fees per fiscal by service type"
+  },
+  {
+    "objectID": "index.html#median-of-total-mou-value-by-service-type",
+    "href": "index.html#median-of-total-mou-value-by-service-type",
+    "title": "hic-dashboard",
+    "section": "Median of total MOU value by service type",
+    "text": "Median of total MOU value by service type"
   }
 ]
