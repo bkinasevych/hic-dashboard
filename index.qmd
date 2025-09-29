@@ -38,12 +38,13 @@ plot_theme <- function() {
 ```
 
 ```{r}
-# get data from Sharepoint
+# get raw data from Sharepoint
 
 site <- get_sharepoint_site(site_name = "Health in Common Team Site")
 
 projects_list <- site$get_list("tbl_projects")
 fees_list <- site$get_list("tbl_fees")
+org_list <- site$get_list("tbl_organizations")
 
 projects <- as_tibble(
   projects_list$list_items(
@@ -51,32 +52,51 @@ projects <- as_tibble(
   select = NULL
 ))
 
-projects <- projects |> 
-  rename("project_id" = id)
-
 fees <- as_tibble(
   fees_list$list_items(
   filter = NULL,
   select = NULL
 ))
 
-fees <- fees |> 
-  rename("fee_id" = id,
-         "project_id" = project_idLookupId)
+organizations <- as_tibble(
+  org_list$list_items(
+    filter = NULL,
+    select = NULL
+    )
+)
+
+
+rm(fees_list, org_list, projects_list)
+
 ```
 
 
 ```{r}
-# load projects data
-projects <- projects |> 
+
+# load organization data
+organizations <- organizations |>
   clean_names() |> 
+  rename("org_id" = id) |> 
+  mutate(org_id = as.double(org_id)) |> 
+  select(
+    org_id, org_name, sector, location, indigenous
+  )
+
+# load projects data
+projects <- projects |>
+  clean_names() |> 
+  rename("project_id" = id) |>
+  select(-org_name) |>
+  left_join(organizations,
+            by = "org_id") |> 
   select(
     project_id,
     request_date,
     project_name,
     service_type,
     decision,
-    status
+    status,
+    org_name
   ) |>
   mutate(request_date = as_date(
     ymd_hms(request_date)
@@ -109,11 +129,15 @@ projects <- projects |>
     service_type = factor(
       service_type,
       levels = c("Program evaluation", "Strategic planning", "Other")
-    )
-  )
+    ))
 
 
 # load fees data
+
+fees <- fees |> 
+  rename("fee_id" = id,
+         "project_id" = project_idLookupId)
+
 fees <- fees |>
   clean_names() |>
   select(fee_id, payment_date, payment_due, project_id) |>
@@ -339,40 +363,4 @@ fee_distribution |>
   )
 ```
 
-## Median of MOUs signed per fiscal by service type
-
-```{r}
-service_type <- projects |> 
-  select(service_type, project_id, fiscal_year)
-
-fees |> 
-  select(project_id, payment_due) |> 
-  group_by(project_id) |> 
-  summarize(
-  total_fees = sum(payment_due)  
-  ) |> 
-  left_join(service_type) |> 
-  group_by(fiscal_year, service_type) |> 
-  filter(service_type != "Other") |> 
-  summarize(median = median(total_fees, na.rm = TRUE)) |> 
-  filter(fiscal_year %in% c(2021, 2022, 2023, 2024, 2025)) |> 
-  ggplot(aes(x = fiscal_year,
-             y = median,
-             fill = service_type)) +
-  geom_col(position = "dodge") +
-  scale_fill_manual(values = c(dark_blue, light_blue)) +
-  scale_y_continuous(labels = dollar_format()) +
-  labs(x = "",
-       y = "Median fees",
-       fill = "",
-       caption = "Fiscal year is the year in which the MOU was signed") +
-  plot_theme() +
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor.x = element_blank()
-  )
-  
-  
-
-```
 
