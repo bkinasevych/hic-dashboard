@@ -1,0 +1,17 @@
+{
+  "hash": "cfaa461828d7d969bd5d34dc3af8157b",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\nformat:\n  html:\n    toc: true\n  pptx:\n    slide-level: 2\noutput-file: index\nformat-pptx:\n  output-file: slides\nexecute:\n  warning: false\n  echo: false\n---\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n\n\n## Number of service requests per fiscal year and quarter\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-4-1.png)\n:::\n:::\n\n\n\n## Fees committed per fiscal year\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-5-1.png)\n:::\n:::\n\n\n\n## Number of service requests per fiscal year by type\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-6-1.png)\n:::\n:::\n\n\n\n\n\n## Fees committed per fiscal by type of project\n\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-7-1.png)\n:::\n:::\n\n\n\n\n## Total fees committed in first two quarters of fiscal\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-8-1.png)\n:::\n:::\n\n\n\n## Fees paid by project per fiscal\n\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-pptx/unnamed-chunk-9-1.png)\n:::\n:::\n",
+    "supporting": [
+      "index_files\\figure-pptx"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": null,
+    "postProcess": false
+  }
+}
