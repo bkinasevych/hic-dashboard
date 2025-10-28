@@ -1,33 +1,5 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "hic-dashboard",
-    "section": "",
-    "text": "Number of service requests per fiscal year and quarter\n\n\n\n\n\n\n\n\n\n\n\nFees committed per fiscal year\n\n\n\n\n\n\n\n\n\n\n\nNumber of service requests per fiscal year by type\n\n\n\n\n\n\n\n\n\n\n\nFees committed per fiscal by type of project\n\n\n\n\n\n\n\n\n\n\n\nTotal fees committed in first two quarters of fiscal\n\n\n\n\n\n\n\n\n\n\n\nFees paid by project per fiscal\nThe labeled points are fees over $30,000"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "index.html#fees-committed-per-fiscal-year-by-project-type",
-    "href": "index.html#fees-committed-per-fiscal-year-by-project-type",
-    "title": "hic-dashboard",
-    "section": "Fees committed per fiscal year by project type",
-    "text": "Fees committed per fiscal year by project type\n\n\n\n\n\n\n\n\n\n\nTotal fees committed in first two quarters of fiscal"
-  },
-  {
-    "objectID": "index.html#fees-committed-per-fiscal-by-type-of-project",
-    "href": "index.html#fees-committed-per-fiscal-by-type-of-project",
-    "title": "hic-dashboard",
-    "section": "Fees committed per fiscal by type of project",
-    "text": "Fees committed per fiscal by type of project"
-  },
-  {
     "objectID": "index.html#fees-committed-per-fiscal-year",
     "href": "index.html#fees-committed-per-fiscal-year",
     "title": "hic-dashboard",
@@ -40,6 +12,13 @@
     "title": "hic-dashboard",
     "section": "Number of service requests per fiscal year by type",
     "text": "Number of service requests per fiscal year by type"
+  },
+  {
+    "objectID": "index.html#fees-committed-per-fiscal-by-type-of-project",
+    "href": "index.html#fees-committed-per-fiscal-by-type-of-project",
+    "title": "hic-dashboard",
+    "section": "Fees committed per fiscal by type of project",
+    "text": "Fees committed per fiscal by type of project"
   },
   {
     "objectID": "index.html#total-fees-committed-in-first-two-quarters-of-fiscal",
@@ -56,24 +35,10 @@
     "text": "Fees paid by project per fiscal"
   },
   {
-    "objectID": "index.html#average-fees-per-fiscal-by-service-type",
-    "href": "index.html#average-fees-per-fiscal-by-service-type",
-    "title": "hic-dashboard",
-    "section": "Average fees per fiscal by service type",
-    "text": "Average fees per fiscal by service type"
-  },
-  {
-    "objectID": "index.html#median-of-total-mou-value-by-service-type",
-    "href": "index.html#median-of-total-mou-value-by-service-type",
-    "title": "hic-dashboard",
-    "section": "Median of total MOU value by service type",
-    "text": "Median of total MOU value by service type"
-  },
-  {
-    "objectID": "index.html#median-of-mous-signed-per-fiscal-by-service-type",
-    "href": "index.html#median-of-mous-signed-per-fiscal-by-service-type",
-    "title": "hic-dashboard",
-    "section": "Median of MOUs signed per fiscal by service type",
-    "text": "Median of MOUs signed per fiscal by service type"
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
   }
 ]
